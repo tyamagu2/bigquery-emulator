@@ -1211,12 +1211,19 @@ func TestQueryWithTimestampType(t *testing.T) {
 	if err := table.Create(ctx, &bigquery.TableMetadata{
 		Schema: []*bigquery.FieldSchema{
 			{Name: "ts", Type: bigquery.TimestampFieldType},
+			{Name: "b", Type: bigquery.BooleanFieldType},
 		},
 	}); err != nil {
 		t.Fatalf("%+v", err)
 	}
 
-	query := client.Query("SELECT CURRENT_TIMESTAMP() AS ts")
+	query := client.Query(`
+SELECT CURRENT_TIMESTAMP() AS ts,
+    STRUCT(
+        NULL AS a
+        , FALSE AS b
+    ).b AS b
+`)
 	query.QueryConfig.Dst = &bigquery.Table{
 		ProjectID: projectName,
 		DatasetID: datasetName,
